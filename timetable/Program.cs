@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -68,7 +69,7 @@ namespace timetable
                 {
                     case ConsoleKey.Enter:
                         isWorking = false;
-                        Authorization();
+                        Authorization(active);
                         break;
                     case ConsoleKey.UpArrow:
                         if (active > 0)
@@ -88,22 +89,30 @@ namespace timetable
             return active;
         }
 
-        static void Authorization()
+        /// <summary>
+        /// Авторизация
+        /// </summary>
+        static void Authorization(int module)
         {
             Console.Clear();
+
+            int xPos = 26;
 
             Console.SetCursorPosition(25, 5);
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("РАСПИСАНИЕ УРОКОВ");
 
-            Console.SetCursorPosition(25, 14);
+            Console.SetCursorPosition(27, 13);
+            Console.WriteLine("АВТОРИЗАЦИЯ");
+
+            Console.SetCursorPosition(xPos, 16);
             Console.WriteLine("Введите логин:");
-            Console.SetCursorPosition(25, 15);
+            Console.SetCursorPosition(xPos, 17);
             string login = Console.ReadLine();
 
-            Console.SetCursorPosition(25, 17);
+            Console.SetCursorPosition(xPos, 19);
             Console.WriteLine("Введите пароль:");
-            Console.SetCursorPosition(25, 18);
+            Console.SetCursorPosition(xPos, 20);
             ConsoleKeyInfo info;
             var password = "";
             while ((info = Console.ReadKey(true)).Key != ConsoleKey.Enter)
@@ -125,10 +134,44 @@ namespace timetable
                 }
             }
 
-            Console.WriteLine(password);
-            Console.ReadKey();
+            //Console.WriteLine(password);
+            //Console.ReadKey(true);
+
+            int lineNumber = 0;
+
+            switch (module)
+            {
+                case 0:
+                    lineNumber = 1;
+                    break;
+                case 1:
+                    lineNumber = 5;
+                    break;
+                case 2:
+                    lineNumber = 9;
+                    break;
+            }
+
+            string loginFile = File.ReadLines("users.txt").Skip(lineNumber).Take(1).First();
+            string passwordFile = File.ReadLines("users.txt").Skip(++lineNumber).Take(1).First();
+
+            Console.SetCursorPosition(23, 22);
+            if (login==loginFile && password==passwordFile)
+            {
+                Console.WriteLine("Вход успешно выполнен");
+            }
+            else
+            {
+                Console.WriteLine("Неправильные логин или пароль");
+            }
+
+            //Console.WriteLine(loginFile);
+            //Console.WriteLine(passwordFile);
+
+            Console.ReadKey(true);
+
             Console.Clear();
-            Select(modules, 30, 15);
+            Select(modules, 28, 15);
 
         }
 
@@ -138,7 +181,7 @@ namespace timetable
             Console.BackgroundColor = ConsoleColor.DarkCyan;
             Console.Clear();
 
-            int index = Select(modules, 30, 15);
+            int index = Select(modules, 29, 15);
 
             Console.WriteLine($"ВЫ {modules[index]}");
             Console.ReadKey(true);
