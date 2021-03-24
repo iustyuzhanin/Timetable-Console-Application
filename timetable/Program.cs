@@ -162,21 +162,25 @@ namespace timetable
             if (login==loginFile && password==passwordFile)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Вход успешно выполнен");
+                Console.WriteLine("Вход выполнен успешно.");
+                Console.ReadKey(true);
             }
             else
             {
                 Console.SetCursorPosition(20, 22);
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.BackgroundColor = ConsoleColor.Black;
-                Console.WriteLine("Неправильный логин или пароль");
+                Console.WriteLine("Неправильный логин или пароль.");
+                Console.SetCursorPosition(25, 23);
+                Console.WriteLine("Введите еще раз.");
+                Console.BackgroundColor = ConsoleColor.DarkCyan;
+                Console.ReadKey(true);
+                Authorization(module);
             }
 
             //Console.WriteLine(loginFile);
             //Console.WriteLine(passwordFile);
-
-            Console.ReadKey(true);
-
+           
             Console.Clear();
             Select(modules, 28, 15);
 
