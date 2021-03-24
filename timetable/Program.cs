@@ -20,10 +20,10 @@ namespace timetable
         /// <summary>
         /// Вертикальное меню
         /// </summary>
-        /// <param name="menu"></param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="active"></param>
+        /// <param name="menu">Меню</param>
+        /// <param name="x">Х</param>
+        /// <param name="y">У</param>
+        /// <param name="active">Выбор меню</param>
         static void DrawMenu(string[] menu, int x, int y, int active)
         {
             //Console.BackgroundColor = ConsoleColor.Blue;
@@ -45,9 +45,9 @@ namespace timetable
         /// <summary>
         /// Перемещение курсором по меню и выбор
         /// </summary>
-        /// <param name="menu"></param>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
+        /// <param name="menu">Меню</param>
+        /// <param name="x">Х</param>
+        /// <param name="y">У</param>
         static int Select(string[] menu, int x, int y)
         {
             Console.SetCursorPosition(25, 5);
@@ -92,6 +92,7 @@ namespace timetable
         /// <summary>
         /// Авторизация
         /// </summary>
+        /// <param name="module">Индекс модуля менюшки</param>
         static void Authorization(int module)
         {
             Console.Clear();
@@ -113,6 +114,7 @@ namespace timetable
             Console.SetCursorPosition(xPos, 19);
             Console.WriteLine("Введите пароль:");
             Console.SetCursorPosition(xPos, 20);
+
             ConsoleKeyInfo info;
             var password = "";
             while ((info = Console.ReadKey(true)).Key != ConsoleKey.Enter)
@@ -137,6 +139,7 @@ namespace timetable
             //Console.WriteLine(password);
             //Console.ReadKey(true);
 
+            // номер строки, где нах-ся нужный логин
             int lineNumber = 0;
 
             switch (module)
@@ -158,11 +161,15 @@ namespace timetable
             Console.SetCursorPosition(23, 22);
             if (login==loginFile && password==passwordFile)
             {
+                Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Вход успешно выполнен");
             }
             else
             {
-                Console.WriteLine("Неправильные логин или пароль");
+                Console.SetCursorPosition(20, 22);
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.WriteLine("Неправильный логин или пароль");
             }
 
             //Console.WriteLine(loginFile);
@@ -183,7 +190,7 @@ namespace timetable
 
             int index = Select(modules, 29, 15);
 
-            Console.WriteLine($"ВЫ {modules[index]}");
+            //Console.WriteLine($"ВЫ {modules[index]}");
             Console.ReadKey(true);
         }
     }
