@@ -17,6 +17,26 @@ namespace timetable
                 "ИНФОРМЕР"
             };
 
+        // Информация для директора
+        static string[] directorInformation =
+            {
+                "Учителя",
+                "Предметы",
+                "Классы",
+                "Кабинеты",
+                "Время звонков"
+            };
+
+        /// <summary>
+        /// Заголовок - РАСПИСАНИЕ УРОКОВ
+        /// </summary>
+        static void TitleTimetable()
+        {
+            Console.SetCursorPosition(25, 5);
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine("РАСПИСАНИЕ УРОКОВ");
+        }
+
         /// <summary>
         /// Вертикальное меню
         /// </summary>
@@ -39,7 +59,7 @@ namespace timetable
             Console.ForegroundColor = ConsoleColor.Black;
             Console.SetCursorPosition(x, y + active);
 
-            Console.WriteLine(menu[active]);
+            Console.WriteLine(menu[active].ToUpper());
         }
 
         /// <summary>
@@ -50,9 +70,7 @@ namespace timetable
         /// <param name="y">У</param>
         static int Select(string[] menu, int x, int y)
         {
-            Console.SetCursorPosition(25, 5);
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("РАСПИСАНИЕ УРОКОВ");
+            TitleTimetable();
 
             Console.CursorVisible = false;
             int active = 0;
@@ -69,7 +87,16 @@ namespace timetable
                 {
                     case ConsoleKey.Enter:
                         isWorking = false;
-                        Authorization(active);
+
+                        if (menu == modules)
+                        {
+                            Authorization(active);
+                        }
+                        else if (menu == directorInformation)
+                        {
+                            ModuleDirectorInformation(active);
+                        }
+
                         break;
                     case ConsoleKey.UpArrow:
                         if (active > 0)
@@ -99,9 +126,7 @@ namespace timetable
 
             int xPos = 26;
 
-            Console.SetCursorPosition(25, 5);
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine("РАСПИСАНИЕ УРОКОВ");
+            TitleTimetable();
 
             Console.SetCursorPosition(27, 13);
             Console.WriteLine("АВТОРИЗАЦИЯ");
@@ -164,6 +189,7 @@ namespace timetable
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Вход выполнен успешно.");
                 Console.ReadKey(true);
+                ModuleDirector();
             }
             else
             {
@@ -181,8 +207,68 @@ namespace timetable
             //Console.WriteLine(loginFile);
             //Console.WriteLine(passwordFile);
            
+            //Console.Clear();
+            //Select(modules, 28, 15);
+        }
+
+        static void ModuleDirector()
+        {
             Console.Clear();
-            Select(modules, 28, 15);
+            TitleTimetable();
+
+            Console.SetCursorPosition(20, 13);
+            Console.WriteLine("ДОБАВИТЬ/ИЗМЕНИТЬ ИНФОРМАЦИЮ:");
+
+            Select(directorInformation, 28, 16);
+        }
+
+        static void ModuleDirectorInformation(int information)
+        {
+            Console.Clear();
+            TitleTimetable();
+
+            Console.SetCursorPosition(27, 13);
+            Console.WriteLine($"{directorInformation[information].ToUpper()}:");
+
+            string informationSelect = "";
+            switch (information)
+            {
+                case 0:
+                    informationSelect = "teachers";
+                    break;
+                case 1:
+                    informationSelect = "lessons";
+                    break;
+                case 2:
+                    informationSelect = "classes";
+                    break;
+                case 3:
+                    informationSelect = "cabinets";
+                    break;
+                case 4:
+                    informationSelect = "times";
+                    break;
+            }
+
+            int linesCount = System.IO.File.ReadAllLines($@"director/{informationSelect}.txt").Length;
+
+            FileStream informationStream = new FileStream($@"director/{informationSelect}.txt", FileMode.Open);
+            StreamReader informationReader = new StreamReader(informationStream, Encoding.Default);
+
+            int countIndex = 0;
+
+            string[] informationEdit = new string[linesCount];
+
+            while (!informationReader.EndOfStream)
+            {
+                informationEdit[countIndex] = informationReader.ReadLine();
+                countIndex++;
+            }
+
+            informationReader.Close();
+            informationStream.Close();
+
+            Select(informationEdit, 23, 16);
 
         }
 
@@ -192,7 +278,7 @@ namespace timetable
             Console.BackgroundColor = ConsoleColor.DarkCyan;
             Console.Clear();
 
-            int index = Select(modules, 29, 15);
+            Select(modules, 29, 15);
 
             //Console.WriteLine($"ВЫ {modules[index]}");
             Console.ReadKey(true);
