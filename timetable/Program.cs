@@ -444,14 +444,12 @@ namespace timetable
             Console.Clear();
             TitleTimetable();
 
-            string str = $"ДОБАВИТЬ: ";
-            int left = PositionLeft(str);
-            Console.SetCursorPosition(left, 15);
-            Console.Write(str);
+            Console.SetCursorPosition(25, 15);
+            Console.Write("ДОБАВИТЬ: ");
             string informationAdd = Console.ReadLine();
 
             // записываем в файл новые данные
-            //FileStream informationStream = new FileStream($@"director/{informationSelect}.txt", FileMode.Open);
+            //FileStream informationStream = new FileStream($@"director/{informationSelect}.txt", FileMode.OpenOrCreate);
             //StreamWriter informationWriter = new StreamWriter(informationStream, Encoding.Default);
 
             //informationWriter.WriteLine(informationAdd);
