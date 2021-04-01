@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace timetable
@@ -30,13 +31,16 @@ namespace timetable
         // Индекс информаци из модуля Директор
         static int directorInformationIndex = 0;
 
-        // Информация по каждому подразделу директора
+        // Информация изменения по каждому подразделу директора
         static string[] informationEdit;
+
+        // Информация удаления по каждому подразделу директора
+        static string[] informationDelete;
 
         // Имя файла, который нужно открыть для модуля Директор
         static string informationSelect = "";
 
-        // интрументы модуля Диреткор
+        // Интрументы модуля Диреткор
         static string[] tools =
             {
                 "ДОБАВИТЬ",
@@ -44,6 +48,19 @@ namespace timetable
                 "УДАЛИТЬ"
             };
 
+        // Выбор инструмента для выхода в меню
+        static int selectTool = 0;
+
+        /// <summary>
+        /// Надпись выхода
+        /// </summary>
+        static void EscButton()
+        {
+            string str = "Нажмите ESC, чтобы сделать шаг назад";
+            int left = PositionLeft(str);
+            Console.SetCursorPosition(left, 11);
+            Console.WriteLine(str);
+        }
 
         /// <summary>
         /// Для определения центра по ширине консоли для заданной строки
@@ -126,28 +143,59 @@ namespace timetable
                             // авторизация
                             Authorization(active);
                         }
-                        //// меню в модуле Директор
-                        //else if (menu == directorInformation)
-                        //{
-                        //    // список информации в модуле Директор
-                        //    ModuleDirectorInformation(active);
-                        //}
+                        // Информация из модуля Директор
+                        else if (menu == directorInformation)
+                        {
+                            // Меню инструментов
+                            ModuleDirectorTools(active);
+                        }
+                        // Интрументы модуля Диреткор
+                        else if (menu == tools)
+                        {
+                            ModuleDirectorToolsInformation(active);
+                        }
                         //меню по каждому подразделу директора
                         else if (menu == informationEdit)
                         {
                             // страница изменения объектов
                             ModuleDirectorInformationEdit(active);
                         }
-                        else if (menu == directorInformation)
+                        //меню по каждому подразделу директора
+                        else if (menu == informationDelete)
                         {
-                            ModuleDirectorTools(active);
+                            // страница изменения объектов
+                            ModuleDirectorInformationDeleteObject(active);
                         }
+
+
+                        break;
+                    case ConsoleKey.Escape:
+                        if (menu == informationDelete)
+                        {
+                            ModuleDirectorTools(selectTool);
+                        }
+                        else if (menu == informationEdit)
+                        {
+                            ModuleDirectorTools(selectTool);
+                        }
+                        //else if (menu == informationEdit)
+                        //{
+                        //    ModuleDirectorInformation(selectTool);
+                        //}
                         else if (menu == tools)
                         {
-                            ModuleDirectorToolsInformation(active);
+                            ModuleDirector();
                         }
+                        else if (menu == directorInformation)
+                        {
+                            Console.SetWindowSize(70, 40);
+                            Console.BackgroundColor = ConsoleColor.DarkCyan;
+                            Console.Clear();
 
-
+                            string str = modules[0];
+                            int left = PositionLeft(str);
+                            Select(modules, left, 15);
+                        }
                         break;
                     case ConsoleKey.UpArrow:
                         if (active > 0)
@@ -277,6 +325,8 @@ namespace timetable
             Console.Clear();
             TitleTimetable();
 
+            EscButton();
+
             string str = "ИНФОРМАЦИЯ";
             int left = PositionLeft(str);
             Console.SetCursorPosition(left, 13);
@@ -297,56 +347,17 @@ namespace timetable
             Console.Clear();
             TitleTimetable();
             directorInformationIndex = tool;
+            selectTool = tool;
+
+            EscButton();
 
             string str = $"{directorInformation[tool].ToUpper()}";
             int left = PositionLeft(str);
             Console.SetCursorPosition(left, 13);
             Console.WriteLine(str);
 
-            str = tools[0];
-            left = PositionLeft(str);
-            Select(tools, left, 16);
-        }
-
-        static void ModuleDirectorToolsInformation(int tool)
-        {
-            Console.Clear();
-            TitleTimetable();
-
-            string str = $"{tools[tool].ToUpper()}";
-            int left = PositionLeft(str);
-            Console.SetCursorPosition(left, 13);
-            Console.WriteLine(str);
-
+            // получаем имя файла
             switch (tool)
-            {
-                case 0:
-                    ModuleDirectorInformationAdd(directorInformationIndex);
-                    break;
-                case 1:
-                    ModuleDirectorInformation(directorInformationIndex);
-                    break;
-                case 2:
-
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// Список объектов модуля Директор
-        /// </summary>
-        /// <param name="information">Индекс выбранной информации из модуля Директор</param>
-        static void ModuleDirectorInformation(int information)
-        {
-            //Console.Clear();
-            TitleTimetable();
-
-            //string str = $"{tools[information].ToUpper()}";
-            //int left = PositionLeft(str);
-            //Console.SetCursorPosition(left, 13);
-            //Console.WriteLine(str);
-
-            switch (information)
             {
                 case 0:
                     informationSelect = "teachers";
@@ -364,6 +375,50 @@ namespace timetable
                     informationSelect = "times";
                     break;
             }
+
+            str = tools[0];
+            left = PositionLeft(str);
+            Select(tools, left, 16);
+        }
+
+        /// <summary>
+        /// Выбор инструмента
+        /// </summary>
+        /// <param name="tool"></param>
+        static void ModuleDirectorToolsInformation(int tool)
+        {
+            Console.Clear();
+            TitleTimetable();
+
+            string str = $"{tools[tool].ToUpper()}";
+            int left = PositionLeft(str);
+            Console.SetCursorPosition(left, 13);
+            Console.WriteLine(str);
+
+            switch (tool)
+            {
+                case 0:
+                    ModuleDirectorInformationAdd();
+                    break;
+                case 1:
+                    ModuleDirectorInformation(directorInformationIndex);
+                    break;
+                case 2:
+                    ModuleDirectorInformationDelete(directorInformationIndex);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Список объектов модуля Директор
+        /// </summary>
+        /// <param name="information">Индекс выбранной информации из модуля Директор</param>
+        static void ModuleDirectorInformation(int information)
+        {
+            //Console.Clear();
+            TitleTimetable();
+
+            EscButton();
 
             // кол-во строк в файле
             int linesCount = File.ReadAllLines($@"director/{informationSelect}.txt").Length;
@@ -388,7 +443,6 @@ namespace timetable
             string str = informationEdit[0];
             int left = PositionLeft(str);
             Select(informationEdit, left, 16);
-
         }
 
         /// <summary>
@@ -400,6 +454,8 @@ namespace timetable
             Console.Clear();
             TitleTimetable();
 
+            EscButton();
+
             string str = $"ИЗМЕНИТЬ: {informationEdit[informationEditCurrent]}";
             int left = PositionLeft(str);
             Console.SetCursorPosition(left, 15);
@@ -408,6 +464,7 @@ namespace timetable
             str = $"НА: ";
             Console.SetCursorPosition(left, 17);
             Console.Write(str);
+
             string informationEditNew = Console.ReadLine();
 
             foreach (var information in informationEdit)
@@ -431,31 +488,177 @@ namespace timetable
             informationStream.Close();
 
             Console.Clear();
-            Select(informationEdit, 23, 16);
+            str = "ИЗМЕНИТЬ";
+            left = PositionLeft(str);
+            Console.SetCursorPosition(left, 13);
+            Console.WriteLine(str);
+            EscButton();
 
+            str = informationEdit[0];
+            left = PositionLeft(str);
+            Select(informationEdit, left, 16);
         }
 
         /// <summary>
         /// Страница добавления объектов
         /// </summary>
         /// <param name="informationAddCurrent">Индекс объекта, который надо добавить</param>
-        static void ModuleDirectorInformationAdd(int informationAddCurrent)
+        static void ModuleDirectorInformationAdd()
         {
             Console.Clear();
             TitleTimetable();
 
+            EscButton();
+
+            // чтение данных
+            // кол-во строк в файле
+            int linesCount = File.ReadAllLines($@"director/{informationSelect}.txt").Length;
+
+            // читаем из файла
+            FileStream informationStream = new FileStream($@"director/{informationSelect}.txt", FileMode.OpenOrCreate);
+            StreamReader informationReader = new StreamReader(informationStream, Encoding.Default);
+
+            int countIndex = 0;
+
+            informationEdit = new string[linesCount];
+
+            while (!informationReader.EndOfStream)
+            {
+                informationEdit[countIndex] = informationReader.ReadLine();
+                countIndex++;
+            }
+
+            informationReader.Close();
+            informationStream.Close();
+
+            // список объектов
+            string str = informationEdit[0];
+            int left = PositionLeft(str);
+            int yIndex = 17;
+            foreach (var information in informationEdit)
+            {
+                Console.SetCursorPosition(left, yIndex);
+                Console.WriteLine(information);
+                yIndex++;
+            }
+
             Console.SetCursorPosition(25, 15);
             Console.Write("ДОБАВИТЬ: ");
+
+            // выход назад
+            ConsoleKeyInfo info = Console.ReadKey(true);
+            if (info.Key == ConsoleKey.Escape)
+            {
+                ModuleDirectorTools(selectTool);
+            }
+
             string informationAdd = Console.ReadLine();
 
-            // записываем в файл новые данные
-            //FileStream informationStream = new FileStream($@"director/{informationSelect}.txt", FileMode.OpenOrCreate);
-            //StreamWriter informationWriter = new StreamWriter(informationStream, Encoding.Default);
+            // записываем в файл измененные данные
+            FileStream informationStream2 = new FileStream($@"director/{informationSelect}.txt", FileMode.OpenOrCreate);
+            StreamWriter informationWriter = new StreamWriter(informationStream2, Encoding.Default);
 
-            //informationWriter.WriteLine(informationAdd);
+            foreach (var information in informationEdit)
+            {
+                informationWriter.WriteLine($"{information}");
+            }
+            informationWriter.Write(informationAdd);
 
-            //informationWriter.Close();
-            //informationStream.Close();
+            informationWriter.Close();
+            informationStream2.Close();
+
+            ModuleDirectorInformationAdd();
+        }
+
+        /// <summary>
+        /// Страница удаления объектов
+        /// </summary>
+        /// <param name="informationAddCurrent">Индекс объекта, который надо удалить</param>
+        static void ModuleDirectorInformationDelete(int informationDeleteCurrent)
+        {
+            //Console.Clear();
+            TitleTimetable();
+
+            EscButton();
+
+            // кол-во строк в файле
+            int linesCount = File.ReadAllLines($@"director/{informationSelect}.txt").Length;
+
+            // читаем из файла
+            FileStream informationStream = new FileStream($@"director/{informationSelect}.txt", FileMode.OpenOrCreate);
+            StreamReader informationReader = new StreamReader(informationStream, Encoding.Default);
+
+            int countIndex = 0;
+
+            informationDelete = new string[linesCount];
+
+            while (!informationReader.EndOfStream)
+            {
+                informationDelete[countIndex] = informationReader.ReadLine();
+                countIndex++;
+            }
+
+            informationReader.Close();
+            informationStream.Close();
+
+            string str = informationDelete[0];
+            int left = PositionLeft(str);
+            Select(informationDelete, left, 16);
+        }
+
+        static void ModuleDirectorInformationDeleteObject(int informationDeleteCurrent)
+        {
+            Console.Clear();
+            TitleTimetable();
+
+            EscButton();
+
+            // записываем пустой символ
+            informationDelete[informationDeleteCurrent] = "";
+
+            // новый массив
+            string[] informationDelete2 = new string[informationDelete.Length - 1];
+            int index = 0;
+            for (int i = 0; i < informationDelete.Length; i++)
+            {
+                if (informationDelete[i] != "")
+                {
+                    informationDelete2[index] = informationDelete[i];
+                    index++;
+                }
+            }
+
+            informationDelete = new string[informationDelete2.Length];
+            informationDelete = informationDelete2;
+
+            File.Delete($@"director/{informationSelect}.txt");
+
+            // записываем в файл измененные данные
+            FileStream informationStream = new FileStream($@"director/{informationSelect}.txt", FileMode.OpenOrCreate);
+            StreamWriter informationWriter = new StreamWriter(informationStream, Encoding.Default);
+
+            foreach (var information in informationDelete)
+            {
+                informationWriter.WriteLine($"{information}");
+            }
+
+            informationWriter.Close();
+            informationStream.Close();
+
+            //foreach (var inb in informationDelete)
+            //{
+            //    Console.WriteLine(inb);
+            //}
+
+
+            string str = "УДАЛИТЬ";
+            int left = PositionLeft(str);
+            Console.SetCursorPosition(left, 13);
+            Console.WriteLine(str);
+
+            str = informationDelete[0];
+            left = PositionLeft(str);
+            Select(informationDelete, left, 16);
         }
 
         static void Main(string[] args)
