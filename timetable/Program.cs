@@ -28,6 +28,17 @@ namespace timetable
                 "Время звонков"
             };
 
+        // Дни недели для модуля Завуч
+        static string[] daysOfWeek =
+        {
+            "Понедельник",
+            "Вторник",
+            "Среда",
+            "Четверг",
+            "Пятница",
+            "Суббота"
+        };
+
         // Индекс информаци из модуля Директор
         static int directorInformationIndex = 0;
 
@@ -40,6 +51,15 @@ namespace timetable
         // Имя файла, который нужно открыть для модуля Директор
         static string informationSelect = "";
 
+        // Имя файла, который открывает файл с классами для модуля Завуч
+        static string[] informationTeacherClasses;
+
+        // Имя файла, который открывает файл с предметами для модуля Завуч
+        static string[] informationTeacherLessons;
+
+        // Имя файла, с именами учителей для модуля Завуч
+        static string[] informationTeacherName;
+
         // Интрументы модуля Диреткор
         static string[] tools =
             {
@@ -51,6 +71,10 @@ namespace timetable
         // Выбор инструмента для выхода в меню
         static int selectTool = 0;
 
+        // Для кнопки ESCAPE
+        static int selectTool1 = 0;
+
+        static int selectTool2 = 0;
         /// <summary>
         /// Надпись выхода
         /// </summary>
@@ -166,6 +190,21 @@ namespace timetable
                             // страница изменения объектов
                             ModuleDirectorInformationDeleteObject(active);
                         }
+                        // меню по классам завуча
+                        else if (menu == informationTeacherClasses)
+                        {
+                            TeacherDaysOfWeek(active);
+                        }
+                        // меню по дням недели завуча
+                        else if (menu == daysOfWeek)
+                        {
+                            TeacherLessons(active);
+                        }
+                        else if (menu == informationTeacherLessons)
+                        {
+                            TeacherNameLessons(active);
+                        }
+                        
 
 
                         break;
@@ -178,10 +217,6 @@ namespace timetable
                         {
                             ModuleDirectorTools(selectTool);
                         }
-                        //else if (menu == informationEdit)
-                        //{
-                        //    ModuleDirectorInformation(selectTool);
-                        //}
                         else if (menu == tools)
                         {
                             ModuleDirector();
@@ -195,6 +230,28 @@ namespace timetable
                             string str = modules[0];
                             int left = PositionLeft(str);
                             Select(modules, left, 15);
+                        }
+                        else if (menu == informationTeacherClasses)
+                        {
+                            Console.SetWindowSize(70, 40);
+                            Console.BackgroundColor = ConsoleColor.DarkCyan;
+                            Console.Clear();
+
+                            string str = modules[0];
+                            int left = PositionLeft(str);
+                            Select(modules, left, 15);
+                        }
+                        else if (menu == daysOfWeek)
+                        {
+                            TeacherInformation();
+                        }
+                        else if (menu == informationTeacherLessons)
+                        {
+                            TeacherDaysOfWeek(selectTool1);
+                        }
+                        else if (menu == informationTeacherName)
+                        {
+                            TeacherLessons(selectTool2);
                         }
                         break;
                     case ConsoleKey.UpArrow:
@@ -293,7 +350,19 @@ namespace timetable
                 Console.SetCursorPosition(left, 22);
                 Console.WriteLine(str);
                 Console.ReadKey(true);
-                ModuleDirector();
+
+                switch (module)
+                {
+                    case 0:
+                        ModuleDirector();
+                        break;
+                    case 1:
+                        ModuleTeacher();
+                        break;
+                    case 2:
+                        Console.WriteLine("test");
+                        break;
+                }
             }
             else
             {
@@ -660,6 +729,155 @@ namespace timetable
             left = PositionLeft(str);
             Select(informationDelete, left, 16);
         }
+
+        //--------------------------МОДУЛЬ 2--------------------------------
+
+        static void ModuleTeacher()
+        {
+            Console.Clear();
+            TitleTimetable();
+
+            EscButton();
+
+
+
+            string str = directorInformation[1];
+            int left = PositionLeft(str);
+
+            //Select(TeacherInformation, left, 16); 
+            TeacherInformation();
+        }
+
+        static void TeacherInformation(/*int teacherInformation*/)
+        {
+            Console.Clear();
+            EscButton();
+
+            string str = "КЛАССЫ";
+            int left = PositionLeft(str);
+            Console.SetCursorPosition(left, 13);
+            Console.WriteLine(str);
+
+            // кол-во строк в файле
+            int linesCount = File.ReadAllLines($@"director/classes.txt").Length;
+
+            // читаем из файла
+            FileStream informationStream = new FileStream($@"director/classes.txt", FileMode.Open);
+            StreamReader informationReader = new StreamReader(informationStream, Encoding.Default);
+
+            int countIndex = 0;
+
+            informationTeacherClasses = new string[linesCount];
+
+            while (!informationReader.EndOfStream)
+            {
+                informationTeacherClasses[countIndex] = informationReader.ReadLine();
+                countIndex++;
+            }
+
+            informationReader.Close();
+            informationStream.Close();
+
+            str = informationTeacherClasses[0];
+            left = PositionLeft(str);
+
+            Select(informationTeacherClasses, left, 16);
+        }
+
+        static void TeacherDaysOfWeek(int clas)
+        {
+            Console.Clear();
+            TitleTimetable();
+
+            EscButton();
+
+            selectTool1 = clas;
+
+            string str = $"КЛАСС: {informationTeacherClasses[clas]}";
+            int left = PositionLeft(str);
+            Console.SetCursorPosition(left, 13);
+            Console.WriteLine(str);
+
+            str = daysOfWeek[0];
+            left = PositionLeft(str);
+
+            Select(daysOfWeek, left, 16);
+        }
+
+        static void TeacherLessons(int day)
+        {
+            Console.Clear();
+            EscButton();
+
+            selectTool2 = day;
+
+            string str = $"ДЕНЬ НЕДЕЛИ: {daysOfWeek[day]}";
+            int left = PositionLeft(str);
+            Console.SetCursorPosition(left, 13);
+            Console.WriteLine(str);
+            // кол-во строк в файле
+            int linesCount = File.ReadAllLines($@"director/lessons.txt").Length;
+
+            // читаем из файла
+            FileStream informationStream = new FileStream($@"director/lessons.txt", FileMode.Open);
+            StreamReader informationReader = new StreamReader(informationStream, Encoding.Default);
+
+            int countIndex = 0;
+
+            informationTeacherLessons = new string[linesCount];
+
+            while (!informationReader.EndOfStream)
+            {
+                informationTeacherLessons[countIndex] = informationReader.ReadLine();
+                countIndex++;
+            }
+
+            informationReader.Close();
+            informationStream.Close();
+
+            str = informationTeacherLessons[0];
+            left = PositionLeft(str);
+
+            Select(informationTeacherLessons, left, 16);
+        }
+
+        static void TeacherNameLessons(int lesson)
+        {
+            Console.Clear();
+            EscButton();
+
+            selectTool2 = lesson;
+
+            string str = $"ПРЕДМЕТ: {informationTeacherLessons[lesson]}";
+            int left = PositionLeft(str);
+            Console.SetCursorPosition(left, 13);
+            Console.WriteLine(str);
+            // кол-во строк в файле
+            int linesCount = File.ReadAllLines($@"director/teachers.txt").Length;
+
+            // читаем из файла
+            FileStream informationStream = new FileStream($@"director/teachers.txt", FileMode.Open);
+            StreamReader informationReader = new StreamReader(informationStream, Encoding.Default);
+
+            int countIndex = 0;
+
+            informationTeacherName = new string[linesCount];
+
+            while (!informationReader.EndOfStream)
+            {
+                informationTeacherName[countIndex] = informationReader.ReadLine();
+                countIndex++;
+            }
+
+            informationReader.Close();
+            informationStream.Close();
+
+            str = informationTeacherName[0];
+            left = PositionLeft(str);
+
+            Select(informationTeacherName, left, 16);
+        }
+
 
         static void Main(string[] args)
         {
