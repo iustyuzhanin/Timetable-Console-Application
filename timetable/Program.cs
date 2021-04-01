@@ -645,12 +645,6 @@ namespace timetable
             informationWriter.Close();
             informationStream.Close();
 
-            //foreach (var inb in informationDelete)
-            //{
-            //    Console.WriteLine(inb);
-            //}
-
-
             string str = "УДАЛИТЬ";
             int left = PositionLeft(str);
             Console.SetCursorPosition(left, 13);
@@ -660,6 +654,10 @@ namespace timetable
             left = PositionLeft(str);
             Select(informationDelete, left, 16);
         }
+
+        //--------------------------МОДУЛЬ 2--------------------------------
+
+
 
         static void Main(string[] args)
         {
@@ -671,7 +669,6 @@ namespace timetable
             int left = PositionLeft(str);
             Select(modules, left, 15);
 
-            //Console.WriteLine($"ВЫ {modules[index]}");
             Console.ReadKey(true);
         }
     }
