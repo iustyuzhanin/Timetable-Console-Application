@@ -60,7 +60,7 @@ namespace timetable
         // Имя файла, с именами учителей для модуля Завуч
         static string[] informationTeacherName;
 
-        // Интрументы модуля Диреткор
+        // Интрументы модуля Директор
         static string[] tools =
             {
                 "ДОБАВИТЬ",
@@ -68,13 +68,16 @@ namespace timetable
                 "УДАЛИТЬ"
             };
 
+        // Индекс меню tools для вывода строки подтверждения
+        static int toolConfirmation = 0;
+
         // Выбор инструмента для выхода в меню
         static int selectTool = 0;
 
         // Для кнопки ESCAPE
-        static int selectTool1 = 0;
-
-        static int selectTool2 = 0;
+        static int selectClass = 0;
+        static int selectDay = 0;
+        static int selectLesson = 0;
 
         /// <summary>
         /// Надпись выхода
@@ -113,28 +116,21 @@ namespace timetable
         /// <summary>
         /// Подтверждение редактирования информации
         /// </summary>
-        static void Confirmation()
+        static int Confirmation(int toolSelect)
         {
+            int selectAnswer;
             string[] answer =
             {
                 "Да",
                 "Нет"
             };
 
-            //for (int i = 0; i < 5; i++)
-            //{
-            //    for (int j = 0; j < 10; j++)
-            //    {
-            //        Console.BackgroundColor = ConsoleColor.Black;
-            //        Console.SetCursorPosition(10+j,15+i);
-            //    }
-            //}
-
-            string str = "Вы уверны, что хотите удалить?";
+            string str = $"Вы уверены, что хотите {tools[toolSelect]}?";
             int left = PositionLeft(str);
             Console.SetCursorPosition(left, 20);
             Console.WriteLine(str);
-            SelectHorizontal(answer, left, 22);
+            selectAnswer = SelectHorizontal(answer, 31, 22);
+            return selectAnswer;
         }
 
         /// <summary>
@@ -151,14 +147,14 @@ namespace timetable
             int length = menu[0].Length + 1;
             for (int i = 0; i < menu.Length; i++)
             {
-                Console.SetCursorPosition(x + length, y);
+                Console.SetCursorPosition(x + i * 5, y);
                 Console.WriteLine(menu[i]);
-                length = menu[i].Length + 1;
+                //length = menu[i].Length + 1;
             }
 
             //Console.BackgroundColor = ConsoleColor.Yellow;
             Console.ForegroundColor = ConsoleColor.Black;
-            Console.SetCursorPosition(x + 0, y);
+            Console.SetCursorPosition(x + active * 5, y);
 
             Console.WriteLine(menu[active].ToUpper());
         }
@@ -346,11 +342,11 @@ namespace timetable
                         }
                         else if (menu == informationTeacherLessons)
                         {
-                            TeacherDaysOfWeek(selectTool1);
+                            TeacherDaysOfWeek(selectClass);
                         }
                         else if (menu == informationTeacherName)
                         {
-                            TeacherLessons(selectTool2);
+                            TeacherLessons(selectDay);
                         }
                         break;
                     case ConsoleKey.UpArrow:
@@ -635,29 +631,49 @@ namespace timetable
 
             string informationEditNew = Console.ReadLine();
 
-            Confirmation();
+            // подтверждение изменения
+            toolConfirmation = 1;
+            int selectAnswer = Confirmation(toolConfirmation);
 
-            Console.ReadKey();
-
-            foreach (var information in informationEdit)
+            if (selectAnswer == 0)
             {
-                if (information == informationEdit[informationEditCurrent])
+                foreach (var information in informationEdit)
                 {
-                    informationEdit[informationEditCurrent] = informationEditNew;
+                    if (information == informationEdit[informationEditCurrent])
+                    {
+                        informationEdit[informationEditCurrent] = informationEditNew;
+                    }
                 }
-            }
 
-            // записываем в файл измененные данные
-            FileStream informationStream = new FileStream($@"director/{informationSelect}.txt", FileMode.Open);
-            StreamWriter informationWriter = new StreamWriter(informationStream, Encoding.Default);
+                // записываем в файл измененные данные
+                FileStream informationStream = new FileStream($@"director/{informationSelect}.txt", FileMode.Open);
+                StreamWriter informationWriter = new StreamWriter(informationStream, Encoding.Default);
 
-            foreach (var information in informationEdit)
+                foreach (var information in informationEdit)
+                {
+                    informationWriter.WriteLine($"{information}");
+                }
+
+                informationWriter.Close();
+                informationStream.Close();
+            } 
+            else
             {
-                informationWriter.WriteLine($"{information}");
+                Console.Clear();
+                EscButton();
+                str = $"ИЗМЕНИТЬ";
+                left = PositionLeft(str);
+                Console.SetCursorPosition(left, 13);
+                Console.WriteLine(str);
+
+                str = informationEdit[0];
+                left = PositionLeft(str);
+                Select(informationEdit, left, 16);
             }
 
-            informationWriter.Close();
-            informationStream.Close();
+            //Console.ReadKey();
+
+            
 
             Console.Clear();
             str = "ИЗМЕНИТЬ";
@@ -785,46 +801,63 @@ namespace timetable
 
             EscButton();
 
-            // записываем пустой символ
-            informationDelete[informationDeleteCurrent] = "";
+            string str;
+            int left;
 
-            // новый массив
-            string[] informationDelete2 = new string[informationDelete.Length - 1];
-            int index = 0;
-            for (int i = 0; i < informationDelete.Length; i++)
+            // подтверждение изменения
+            toolConfirmation = 2;
+            int selectAnswer = Confirmation(toolConfirmation);
+
+            if (selectAnswer == 0)
             {
-                if (informationDelete[i] != "")
+                // записываем пустой символ
+                informationDelete[informationDeleteCurrent] = "";
+
+                // новый массив
+                string[] informationDelete2 = new string[informationDelete.Length - 1];
+                int index = 0;
+                for (int i = 0; i < informationDelete.Length; i++)
                 {
-                    informationDelete2[index] = informationDelete[i];
-                    index++;
+                    if (informationDelete[i] != "")
+                    {
+                        informationDelete2[index] = informationDelete[i];
+                        index++;
+                    }
                 }
+
+                informationDelete = new string[informationDelete2.Length];
+                informationDelete = informationDelete2;
+
+                File.Delete($@"director/{informationSelect}.txt");
+
+                // записываем в файл измененные данные
+                FileStream informationStream = new FileStream($@"director/{informationSelect}.txt", FileMode.OpenOrCreate);
+                StreamWriter informationWriter = new StreamWriter(informationStream, Encoding.Default);
+
+                foreach (var information in informationDelete)
+                {
+                    informationWriter.WriteLine($"{information}");
+                }
+
+                informationWriter.Close();
+                informationStream.Close();
             }
-
-            informationDelete = new string[informationDelete2.Length];
-            informationDelete = informationDelete2;
-
-            File.Delete($@"director/{informationSelect}.txt");
-
-            // записываем в файл измененные данные
-            FileStream informationStream = new FileStream($@"director/{informationSelect}.txt", FileMode.OpenOrCreate);
-            StreamWriter informationWriter = new StreamWriter(informationStream, Encoding.Default);
-
-            foreach (var information in informationDelete)
+            else
             {
-                informationWriter.WriteLine($"{information}");
+                Console.Clear();
+                EscButton();
+                str = $"УДАЛИТЬ";
+                left = PositionLeft(str);
+                Console.SetCursorPosition(left, 13);
+                Console.WriteLine(str);
+
+                str = informationDelete[0];
+                left = PositionLeft(str);
+                Select(informationDelete, left, 16);
             }
 
-            informationWriter.Close();
-            informationStream.Close();
-
-            //foreach (var inb in informationDelete)
-            //{
-            //    Console.WriteLine(inb);
-            //}
-
-
-            string str = "УДАЛИТЬ";
-            int left = PositionLeft(str);
+            str = "УДАЛИТЬ";
+            left = PositionLeft(str);
             Console.SetCursorPosition(left, 13);
             Console.WriteLine(str);
 
@@ -834,15 +867,15 @@ namespace timetable
         }
 
         //--------------------------МОДУЛЬ 2--------------------------------
-
+        /// <summary>
+        /// Второй модуль - "Завуч"
+        /// </summary>
         static void ModuleTeacher()
         {
             Console.Clear();
             TitleTimetable();
 
             EscButton();
-
-
 
             string str = directorInformation[1];
             int left = PositionLeft(str);
@@ -851,6 +884,9 @@ namespace timetable
             TeacherInformation();
         }
 
+        /// <summary>
+        /// Вывод классов из файла
+        /// </summary>
         static void TeacherInformation(/*int teacherInformation*/)
         {
             Console.Clear();
@@ -888,6 +924,10 @@ namespace timetable
             Select(informationTeacherClasses, left, 16);
         }
 
+        /// <summary>
+        /// Вывод дня недели
+        /// </summary>
+        /// <param name="clas">передаем класс</param>
         static void TeacherDaysOfWeek(int clas)
         {
             Console.Clear();
@@ -895,7 +935,7 @@ namespace timetable
 
             EscButton();
 
-            selectTool1 = clas;
+            selectClass = clas;
 
             string str = $"КЛАСС: {informationTeacherClasses[clas]}";
             int left = PositionLeft(str);
@@ -908,13 +948,17 @@ namespace timetable
             Select(daysOfWeek, left, 16);
         }
 
+        /// <summary>
+        /// Вывод предметов из файла
+        /// </summary>
+        /// <param name="day">передаем день недели для информации</param>
         static void TeacherLessons(int day)
         {
             Console.Clear();
             TitleTimetable();
             EscButton();
 
-            selectTool2 = day;
+            selectDay = day;
 
             string str = $"ДЕНЬ НЕДЕЛИ: {daysOfWeek[day]}";
             int left = PositionLeft(str);
@@ -946,13 +990,17 @@ namespace timetable
             Select(informationTeacherLessons, left, 16);
         }
 
+        /// <summary>
+        /// Вывод учителей из файла
+        /// </summary>
+        /// <param name="lesson">Предмет</param>
         static void TeacherNameLessons(int lesson)
         {
             Console.Clear();
             TitleTimetable();
             EscButton();
 
-            selectTool2 = lesson;
+            selectLesson = lesson;
 
             string str = $"ПРЕДМЕТ: {informationTeacherLessons[lesson]}";
             int left = PositionLeft(str);
