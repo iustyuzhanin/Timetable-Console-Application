@@ -751,6 +751,7 @@ namespace timetable
         static void TeacherInformation(/*int teacherInformation*/)
         {
             Console.Clear();
+            TitleTimetable();
             EscButton();
 
             string str = "КЛАССЫ";
@@ -807,6 +808,7 @@ namespace timetable
         static void TeacherLessons(int day)
         {
             Console.Clear();
+            TitleTimetable();
             EscButton();
 
             selectTool2 = day;
@@ -844,6 +846,7 @@ namespace timetable
         static void TeacherNameLessons(int lesson)
         {
             Console.Clear();
+            TitleTimetable();
             EscButton();
 
             selectTool2 = lesson;
