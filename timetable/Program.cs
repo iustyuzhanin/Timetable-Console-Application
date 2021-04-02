@@ -75,6 +75,7 @@ namespace timetable
         static int selectTool1 = 0;
 
         static int selectTool2 = 0;
+
         /// <summary>
         /// Надпись выхода
         /// </summary>
@@ -107,6 +108,104 @@ namespace timetable
             Console.SetCursorPosition(left, 5);
             Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine(str);
+        }
+
+        /// <summary>
+        /// Подтверждение редактирования информации
+        /// </summary>
+        static void Confirmation()
+        {
+            string[] answer =
+            {
+                "Да",
+                "Нет"
+            };
+
+            //for (int i = 0; i < 5; i++)
+            //{
+            //    for (int j = 0; j < 10; j++)
+            //    {
+            //        Console.BackgroundColor = ConsoleColor.Black;
+            //        Console.SetCursorPosition(10+j,15+i);
+            //    }
+            //}
+
+            string str = "Вы уверны, что хотите удалить?";
+            int left = PositionLeft(str);
+            Console.SetCursorPosition(left, 20);
+            Console.WriteLine(str);
+            SelectHorizontal(answer, left, 22);
+        }
+
+        /// <summary>
+        /// Горизонтальное меню
+        /// </summary>
+        /// <param name="menu">Меню</param>
+        /// <param name="x">Х</param>
+        /// <param name="y">У</param>
+        /// <param name="active">Выбор меню</param>
+        static void DrawMenuHorizontal(string[] menu, int x, int y, int active)
+        {
+            //Console.BackgroundColor = ConsoleColor.Blue;
+            Console.ForegroundColor = ConsoleColor.White;
+            int length = menu[0].Length + 1;
+            for (int i = 0; i < menu.Length; i++)
+            {
+                Console.SetCursorPosition(x + length, y);
+                Console.WriteLine(menu[i]);
+                length = menu[i].Length + 1;
+            }
+
+            //Console.BackgroundColor = ConsoleColor.Yellow;
+            Console.ForegroundColor = ConsoleColor.Black;
+            Console.SetCursorPosition(x + 0, y);
+
+            Console.WriteLine(menu[active].ToUpper());
+        }
+
+        /// <summary>
+        /// Выбор для горизонтального меню
+        /// </summary>
+        /// <param name="menu"></param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        static int SelectHorizontal(string[] menu, int x, int y)
+        {
+            TitleTimetable();
+
+            Console.CursorVisible = false;
+            int active = 0;
+            bool isWorking = true;
+            //int menuBorder = 0;
+            while (isWorking)
+            {
+                // 0) отрисуем менюшку
+                DrawMenuHorizontal(menu, x, y, active);
+                // 1) считываем клавишу
+                ConsoleKeyInfo info = Console.ReadKey(true);
+                // 2) анализ клавиши
+                switch (info.Key)
+                {
+                    case ConsoleKey.Enter:
+                        isWorking = false;
+                        break;
+                    case ConsoleKey.LeftArrow:
+                        if (active > 0)
+                        {
+                            active--;
+                        }
+                        break;
+                    case ConsoleKey.RightArrow:
+                        if (active < menu.Length - 1)
+                        {
+                            active++;
+                        }
+                        break;
+                }
+            }
+            Console.CursorVisible = true;
+            return active;
         }
 
         /// <summary>
@@ -535,6 +634,10 @@ namespace timetable
             Console.Write(str);
 
             string informationEditNew = Console.ReadLine();
+
+            Confirmation();
+
+            Console.ReadKey();
 
             foreach (var information in informationEdit)
             {
