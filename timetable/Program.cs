@@ -85,6 +85,12 @@ namespace timetable
         static int selectCabinet = 0;
         static int selectTime = 0;
 
+        // Ширина консоли
+        static int X = 120;
+
+        // Высота консоли
+        static int Y = 40;
+
         /// <summary>
         /// Надпись выхода
         /// </summary>
@@ -334,7 +340,7 @@ namespace timetable
                         }
                         else if (menu == directorInformation)
                         {
-                            Console.SetWindowSize(70, 40);
+                            Console.SetWindowSize(X, Y);
                             Console.BackgroundColor = ConsoleColor.DarkCyan;
                             Console.Clear();
 
@@ -344,7 +350,7 @@ namespace timetable
                         }
                         else if (menu == informationTeacherClasses)
                         {
-                            Console.SetWindowSize(70, 40);
+                            Console.SetWindowSize(X, Y);
                             Console.BackgroundColor = ConsoleColor.DarkCyan;
                             Console.Clear();
 
@@ -1232,7 +1238,7 @@ namespace timetable
 
         static void Main(string[] args)
         {
-            Console.SetWindowSize(70, 40);
+            Console.SetWindowSize(X, Y);
             Console.BackgroundColor = ConsoleColor.DarkCyan;
             Console.Clear();
 
