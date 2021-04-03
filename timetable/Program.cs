@@ -552,7 +552,7 @@ namespace timetable
                 left = PositionLeft(str);
                 Console.SetCursorPosition(left, 22);
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.BackgroundColor = ConsoleColor.Black;
+                //Console.BackgroundColor = ConsoleColor.Black;
                 Console.WriteLine(str);
 
                 str = "Введите еще раз";
