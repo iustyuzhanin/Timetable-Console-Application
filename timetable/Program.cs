@@ -1040,7 +1040,6 @@ namespace timetable
             int left = PositionLeft(str);
             Select(modules, left, 15);
 
-            //Console.WriteLine($"ВЫ {modules[index]}");
             Console.ReadKey(true);
         }
     }
