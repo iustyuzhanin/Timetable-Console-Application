@@ -1355,7 +1355,6 @@ namespace timetable
             {
                 allfolders[i] = Path.GetFileName(allfolders[i]);
             }
-
             str = allfolders[0];
             left = PositionLeft(str);
             Select(allfolders, left, 16);
@@ -1380,8 +1379,9 @@ namespace timetable
             allfiles = Directory.GetFiles($@"headteacher/{allfolders[folder]}");
             for (int i = 0; i < allfiles.Length; i++)
             {
-                allfiles[i] = Path.GetFileName(allfiles[i]);
+                allfiles[i] = Path.GetFileNameWithoutExtension(allfiles[i]);
             }
+            //Array.Sort(allfiles);
             str = allfiles[0];
             left = PositionLeft(str);
             Select(allfiles, left, 16);
@@ -1408,10 +1408,10 @@ namespace timetable
             Console.WriteLine(str);
 
             // кол-во строк в файле
-            int linesCount = File.ReadAllLines($@"headteacher/{allfolders[selectInformerClas]}/{allfiles[selectInformerDay]}").Length;
+            int linesCount = File.ReadAllLines($@"headteacher/{allfolders[selectInformerClas]}/{allfiles[selectInformerDay]}.txt").Length;
 
             // читаем из файла
-            FileStream informationStream = new FileStream($@"headteacher/{allfolders[selectInformerClas]}/{allfiles[selectInformerDay]}", FileMode.Open);
+            FileStream informationStream = new FileStream($@"headteacher/{allfolders[selectInformerClas]}/{allfiles[selectInformerDay]}.txt", FileMode.Open);
             StreamReader informationReader = new StreamReader(informationStream, Encoding.Default);
 
             int countIndex = 0;
@@ -1426,6 +1426,8 @@ namespace timetable
 
             informationReader.Close();
             informationStream.Close();
+
+            Array.Sort(timetable);
 
             str = timetable[0];
             left = PositionLeft(str);
