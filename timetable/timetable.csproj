@@ -49,13 +49,5 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="files\director\cabinets.txt" />
-    <Content Include="files\director\classes.txt" />
-    <Content Include="files\director\lessons.txt" />
-    <Content Include="files\director\teachers.txt" />
-    <Content Include="files\director\times.txt" />
-    <Content Include="files\users.txt" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
