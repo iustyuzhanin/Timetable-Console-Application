@@ -36,6 +36,13 @@ namespace timetable
             "Суббота"
         };
 
+        // Меню для модуля Информер
+        static string[] informerMenu =
+        {
+            "Класс",
+            "Учитель"
+        };
+
         // Индекс информаци из модуля Директор
         static int directorInformationIndex = 0;
 
@@ -63,6 +70,12 @@ namespace timetable
         // Имя файла, со звонками для модуля Завуч
         static string[] informationTeacherTimes;
 
+        // Имена классов для модуля Информер
+        static string[] allfolders;
+
+        // Имена файлов для модуля Информер;
+        static string[] allfiles;
+
         // Интрументы модуля Директор
         static string[] tools =
             {
@@ -84,6 +97,8 @@ namespace timetable
         static int selectTeacher = 0;
         static int selectCabinet = 0;
         static int selectTime = 0;
+        static int selectInformerClas = 0;
+        static int selectInformerDay = 0;
 
         // Ширина консоли
         static int X = 120;
@@ -141,7 +156,7 @@ namespace timetable
             int left = PositionLeft(str);
             Console.SetCursorPosition(left, 20);
             Console.WriteLine(str);
-            selectAnswer = SelectHorizontal(answer, 31, 22);
+            selectAnswer = SelectHorizontal(answer, left+12, 22);
             return selectAnswer;
         }
 
@@ -271,8 +286,15 @@ namespace timetable
                         // глвное меню
                         if (menu == modules)
                         {
-                            // авторизация
-                            Authorization(active);
+                            if (active == 2)
+                            {
+                                ModuleInformer();
+                            }
+                            else
+                            {
+                                // авторизация
+                                Authorization(active);
+                            }
                         }
                         // Информация из модуля Директор
                         else if (menu == directorInformation)
@@ -319,9 +341,21 @@ namespace timetable
                         {
                             TeacherTimes(active);
                         }
-                        else if(menu==informationTeacherTimes)
+                        else if(menu == informationTeacherTimes)
                         {
                             TeacherOutput(active);
+                        }
+                        else if (menu == informerMenu)
+                        {
+                            ModuleInformerClasses(active);
+                        }
+                        else if (menu == allfolders)
+                        {
+                            ModuleInformerDays(active);
+                        }
+                        else if (menu == allfiles)
+                        {
+                            ModuleInformerOutput(active);
                         }
 
                         break;
@@ -378,6 +412,28 @@ namespace timetable
                         {
                             TeacherCabinets(selectTeacher);
                         }
+                        else if (menu == informerMenu)
+                        {
+                            Console.SetWindowSize(X, Y);
+                            Console.BackgroundColor = ConsoleColor.DarkCyan;
+                            Console.Clear();
+
+                            string str = modules[0];
+                            int left = PositionLeft(str);
+                            Select(modules, left, 15);
+                        }
+                        else if (menu == allfolders)
+                        {
+                            ModuleInformer();
+                        }
+                        else if (menu == allfiles)
+                        {
+                            ModuleInformerClasses(selectInformerClas);
+                        }
+                        //else if (menu == )
+                        //{
+
+                        //}
                         break;
 
                     case ConsoleKey.UpArrow:
@@ -459,9 +515,9 @@ namespace timetable
                 case 1:
                     lineNumber = 5;
                     break;
-                case 2:
-                    lineNumber = 9;
-                    break;
+                //case 2:
+                //    lineNumber = 9;
+                //    break;
             }
 
             string loginFile = File.ReadLines("users.txt").Skip(lineNumber).Take(1).First();
@@ -486,7 +542,7 @@ namespace timetable
                         ModuleTeacher();
                         break;
                     case 2:
-                        Console.WriteLine("test");
+                        ModuleInformer();
                         break;
                 }
             }
@@ -760,9 +816,9 @@ namespace timetable
                 Console.WriteLine(information);
                 yIndex++;
             }
-
-            Console.SetCursorPosition(25, 15);
-            Console.Write("ДОБАВИТЬ: ");
+            str = "ДОБАВИТЬ:";
+            Console.SetCursorPosition(left, 15);
+            Console.Write(str);
 
             // выход назад
             ConsoleKeyInfo info = Console.ReadKey(true);
@@ -872,6 +928,17 @@ namespace timetable
 
                 informationWriter.Close();
                 informationStream.Close();
+
+                Console.Clear();
+                EscButton();
+                str = $"УДАЛИТЬ";
+                left = PositionLeft(str);
+                Console.SetCursorPosition(left, 13);
+                Console.WriteLine(str);
+
+                str = informationDelete[0];
+                left = PositionLeft(str);
+                Select(informationDelete, left, 16);
             }
             else
             {
@@ -1224,16 +1291,166 @@ namespace timetable
             Console.SetCursorPosition(left, 16);
             Console.WriteLine(str);
 
+            str = timetable[0];
+            left = PositionLeft(str);
             int y = 18;
             foreach (var time in timetable)
             {
-                if (time!="")
+                if (time != "")
                 {
-                    Console.SetCursorPosition(2, y);
+                    Console.SetCursorPosition(left, y);
                     Console.WriteLine(time);
                     y++;
                 }
             }
+
+            ConsoleKeyInfo info = Console.ReadKey(true);
+            switch (info.Key)
+            {
+                case ConsoleKey.Escape:
+                    TeacherTimes(selectCabinet);
+                    break;
+                default:
+                    ModuleTeacher();
+                    break;
+            }
+        }
+
+        //--------------------------МОДУЛЬ 3--------------------------------
+        /// <summary>
+        /// Третий модуль "Информер", вывод сформированного расписания
+        /// </summary>
+        static void ModuleInformer()
+        {
+            Console.Clear();
+            TitleTimetable();
+            EscButton();
+
+            string str = $"ПОКАЗАТЬ РАСПИСАНИЕ";
+            int left = PositionLeft(str);
+            Console.SetCursorPosition(left, 13);
+            Console.WriteLine(str);
+
+            left = PositionLeft(informerMenu[0]);
+            Select(informerMenu, left, 16);
+        }
+
+        /// <summary>
+        /// Вывод расписания по выбранному классу
+        /// </summary>
+        /// <param name="clas">Индекс класса</param>
+        static void ModuleInformerClasses(int clas)
+        {
+            Console.Clear();
+            TitleTimetable();
+            EscButton();
+
+            string str = $"КЛАССЫ";
+            int left = PositionLeft(str);
+            Console.SetCursorPosition(left, 13);
+            Console.WriteLine(str);
+
+            allfolders = Directory.GetDirectories(@"headteacher/");
+            for (int i = 0; i < allfolders.Length; i++)
+            {
+                allfolders[i] = Path.GetFileName(allfolders[i]);
+            }
+
+            str = allfolders[0];
+            left = PositionLeft(str);
+            Select(allfolders, left, 16);
+        }
+
+        /// <summary>
+        /// Вывод расписания по дню недели
+        /// </summary>
+        static void ModuleInformerDays(int folder)
+        {
+            Console.Clear();
+            TitleTimetable();
+            EscButton();
+
+            selectInformerClas = folder;
+
+            string str = $"КЛАСС: {allfolders[folder]}";
+            int left = PositionLeft(str);
+            Console.SetCursorPosition(left, 13);
+            Console.WriteLine(str);
+
+            allfiles = Directory.GetFiles($@"headteacher/{allfolders[folder]}");
+            for (int i = 0; i < allfiles.Length; i++)
+            {
+                allfiles[i] = Path.GetFileName(allfiles[i]);
+            }
+            str = allfiles[0];
+            left = PositionLeft(str);
+            Select(allfiles, left, 16);
+        }
+
+        /// <summary>
+        /// Вывод расписания для выбранного класса и дня недели
+        /// </summary>
+        static void ModuleInformerOutput(int file)
+        {
+            Console.Clear();
+            TitleTimetable();
+            EscButton();
+
+            selectInformerDay = file;
+
+            string str = $"КЛАСС: {allfolders[selectInformerClas]}";
+            int left = PositionLeft(str);
+            Console.SetCursorPosition(left, 15);
+            Console.WriteLine(str);
+            str = $"{allfiles[selectInformerDay]}";
+            left = PositionLeft(str);
+            Console.SetCursorPosition(left, 16);
+            Console.WriteLine(str);
+
+            // кол-во строк в файле
+            int linesCount = File.ReadAllLines($@"headteacher/{allfolders[selectInformerClas]}/{allfiles[selectInformerDay]}").Length;
+
+            // читаем из файла
+            FileStream informationStream = new FileStream($@"headteacher/{allfolders[selectInformerClas]}/{allfiles[selectInformerDay]}", FileMode.Open);
+            StreamReader informationReader = new StreamReader(informationStream, Encoding.Default);
+
+            int countIndex = 0;
+
+            string[] timetable = new string[linesCount];
+
+            while (!informationReader.EndOfStream)
+            {
+                timetable[countIndex] = informationReader.ReadLine();
+                countIndex++;
+            }
+
+            informationReader.Close();
+            informationStream.Close();
+
+            str = timetable[0];
+            left = PositionLeft(str);
+            int y = 18;
+            foreach (var time in timetable)
+            {
+                if (time != "")
+                {
+                    Console.SetCursorPosition(left, y);
+                    Console.WriteLine(time);
+                    y++;
+                }
+            }
+
+            ConsoleKeyInfo info = Console.ReadKey(true);
+            switch (info.Key)
+            {
+                case ConsoleKey.Escape:
+                    ModuleInformerDays(selectInformerClas);
+                    break;
+                default:
+                    ModuleInformer();
+                    break;
+            }
+
         }
 
         static void Main(string[] args)
