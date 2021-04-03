@@ -57,6 +57,12 @@ namespace timetable
         // Имя файла, с именами учителей для модуля Завуч
         static string[] informationTeacherName;
 
+        // Имя файла, с кабинетами для модуля Завуч
+        static string[] informationTeacherCabinets;
+
+        // Имя файла, со звонками для модуля Завуч
+        static string[] informationTeacherTimes;
+
         // Интрументы модуля Директор
         static string[] tools =
             {
@@ -75,6 +81,9 @@ namespace timetable
         static int selectClass = 0;
         static int selectDay = 0;
         static int selectLesson = 0;
+        static int selectTeacher = 0;
+        static int selectCabinet = 0;
+        static int selectTime = 0;
 
         /// <summary>
         /// Надпись выхода
@@ -296,8 +305,18 @@ namespace timetable
                         {
                             TeacherNameLessons(active);
                         }
-                        
-
+                        else if (menu == informationTeacherName)
+                        {
+                            TeacherCabinets(active);
+                        }
+                        else if (menu == informationTeacherCabinets)
+                        {
+                            TeacherTimes(active);
+                        }
+                        else if(menu==informationTeacherTimes)
+                        {
+                            TeacherOutput(active);
+                        }
 
                         break;
                     case ConsoleKey.Escape:
@@ -345,7 +364,16 @@ namespace timetable
                         {
                             TeacherLessons(selectDay);
                         }
+                        else if (menu == informationTeacherCabinets)
+                        {
+                            TeacherNameLessons(selectLesson);
+                        }
+                        else if (menu == informationTeacherTimes)
+                        {
+                            TeacherCabinets(selectTeacher);
+                        }
                         break;
+
                     case ConsoleKey.UpArrow:
                         if (active > 0)
                         {
@@ -1003,6 +1031,7 @@ namespace timetable
             int left = PositionLeft(str);
             Console.SetCursorPosition(left, 13);
             Console.WriteLine(str);
+
             // кол-во строк в файле
             int linesCount = File.ReadAllLines($@"director/teachers.txt").Length;
 
@@ -1029,6 +1058,177 @@ namespace timetable
             Select(informationTeacherName, left, 16);
         }
 
+        /// <summary>
+        /// Вывод кабинетов из файла
+        /// </summary>
+        /// <param name="teacherName">Имя учителя</param>
+        static void TeacherCabinets(int teacherName)
+        {
+            Console.Clear();
+            TitleTimetable();
+            EscButton();
+
+            selectTeacher = teacherName;
+
+            string str = $"УЧИТЕЛЬ: {informationTeacherName[teacherName]}";
+            int left = PositionLeft(str);
+            Console.SetCursorPosition(left, 13);
+            Console.WriteLine(str);
+
+            // кол-во строк в файле
+            int linesCount = File.ReadAllLines($@"director/cabinets.txt").Length;
+
+            // читаем из файла
+            FileStream informationStream = new FileStream($@"director/cabinets.txt", FileMode.Open);
+            StreamReader informationReader = new StreamReader(informationStream, Encoding.Default);
+
+            int countIndex = 0;
+
+            informationTeacherCabinets = new string[linesCount];
+
+            while (!informationReader.EndOfStream)
+            {
+                informationTeacherCabinets[countIndex] = informationReader.ReadLine();
+                countIndex++;
+            }
+
+            informationReader.Close();
+            informationStream.Close();
+
+            str = informationTeacherCabinets[0];
+            left = PositionLeft(str);
+
+            Select(informationTeacherCabinets, left, 16);
+        }
+
+        /// <summary>
+        /// Вывод звонков уроков из файла
+        /// </summary>
+        /// <param name="teacherCabinet">Кабинет</param>
+        static void TeacherTimes(int teacherCabinet)
+        {
+            Console.Clear();
+            TitleTimetable();
+            EscButton();
+
+            selectCabinet = teacherCabinet;
+
+            string str = $"КАБИНЕТ: {informationTeacherCabinets[teacherCabinet]}";
+            int left = PositionLeft(str);
+            Console.SetCursorPosition(left, 13);
+            Console.WriteLine(str);
+
+            // кол-во строк в файле
+            int linesCount = File.ReadAllLines($@"director/times.txt").Length;
+
+            // читаем из файла
+            FileStream informationStream = new FileStream($@"director/times.txt", FileMode.Open);
+            StreamReader informationReader = new StreamReader(informationStream, Encoding.Default);
+
+            int countIndex = 0;
+
+            informationTeacherTimes = new string[linesCount];
+
+            while (!informationReader.EndOfStream)
+            {
+                informationTeacherTimes[countIndex] = informationReader.ReadLine();
+                countIndex++;
+            }
+
+            informationReader.Close();
+            informationStream.Close();
+
+            str = informationTeacherTimes[0];
+            left = PositionLeft(str);
+
+            Select(informationTeacherTimes, left, 16);
+        }
+
+        /// <summary>
+        /// Вывод сформированного расписания для класса
+        /// </summary>
+        /// <param name="teacherTime">Время звонков</param>
+        static void TeacherOutput(int teacherTime)
+        {
+            selectTime = teacherTime;
+
+            Console.Clear();
+            TitleTimetable();
+            EscButton();
+
+            // Сформировать расписание для класса и вывод на экран
+            CreateSchedule();
+            Console.ReadKey();
+            ModuleTeacher();
+        }
+
+        /// <summary>
+        /// Сформировать расписание для класса
+        /// </summary>
+        /// <param name="selectClass">Класс</param>
+        /// <param name="selectDay">День недели</param>
+        /// <param name="selectLesson">Урок</param>
+        /// <param name="selectTeacher">Учитель</param>
+        /// <param name="selectCabinet">Кабинет</param>
+        /// <param name="selectTime">Время звонков</param>
+        static void CreateSchedule(/*int selectClass, int selectDay, int selectLesson, int selectTeacher, int selectCabinet, int selectTime*/)
+        {
+            // Создаем папку
+            Directory.CreateDirectory($@"headteacher/{informationTeacherClasses[selectClass]}");
+
+            // записываем из файла
+            FileStream informationStream2 = new FileStream($@"headteacher/{informationTeacherClasses[selectClass]}/{daysOfWeek[selectDay]}.txt", FileMode.Append);
+            StreamWriter informationWriter = new StreamWriter(informationStream2, Encoding.Default);
+
+            informationWriter.Write($"{informationTeacherTimes[selectTime]}" +
+                $" | {informationTeacherLessons[selectLesson]}" +
+                $" | {informationTeacherName[selectTeacher]}" +
+                $" (каб. {informationTeacherCabinets[selectCabinet]})");
+            informationWriter.WriteLine();
+
+            informationWriter.Close();
+            informationStream2.Close();
+
+            // кол-во строк в файле
+            int linesCount = File.ReadAllLines($@"headteacher/{informationTeacherClasses[selectClass]}/{daysOfWeek[selectDay]}.txt").Length;
+
+            // читаем из файла
+            FileStream informationStream = new FileStream($@"headteacher/{informationTeacherClasses[selectClass]}/{daysOfWeek[selectDay]}.txt", FileMode.OpenOrCreate);
+            StreamReader informationReader = new StreamReader(informationStream, Encoding.Default);
+
+            int countIndex = 0;
+
+            string[] timetable = new string[linesCount];
+
+            while (!informationReader.EndOfStream)
+            {
+                timetable[countIndex] = informationReader.ReadLine();
+                countIndex++;
+            }
+
+            informationReader.Close();
+            informationStream.Close();
+
+            string str = $"КЛАСС: {informationTeacherClasses[selectClass]}";
+            int left = PositionLeft(str);
+            Console.SetCursorPosition(left, 15);
+            Console.WriteLine(str);
+            str = $"{daysOfWeek[selectDay]}";
+            left = PositionLeft(str);
+            Console.SetCursorPosition(left, 16);
+            Console.WriteLine(str);
+
+            int y = 18;
+            foreach (var time in timetable)
+            {
+                if (time!="")
+                {
+                    Console.SetCursorPosition(2, y);
+                    Console.WriteLine(time);
+                    y++;
+                }
+            }
+        }
 
         static void Main(string[] args)
         {
@@ -1044,4 +1244,3 @@ namespace timetable
         }
     }
 }
-
