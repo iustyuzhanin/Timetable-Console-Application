@@ -39,8 +39,8 @@ namespace timetable
         // Меню для модуля Информер
         static string[] informerMenu =
         {
-            "Класс",
-            "Учитель"
+            "Класс"
+            //"Учитель"
         };
 
         // Индекс информаци из модуля Директор
@@ -115,6 +115,53 @@ namespace timetable
             int left = PositionLeft(str);
             Console.SetCursorPosition(left, 11);
             Console.WriteLine(str);
+        }
+
+        /// <summary>
+        /// Сортировка дней недели
+        /// </summary>
+        /// <param name="daysOfWeek">Исходный массив дней недели</param>>
+        static string[] SortedDaysOfWeek(string[] daysOfWeek)
+        {
+            string[] sortedDays = new string[6];
+
+            for (int i = 0; i < daysOfWeek.Length; i++)
+            {
+                switch (daysOfWeek[i])
+                {
+                    case "Понедельник":
+                        sortedDays[0] = "Понедельник";
+                        break;
+                    case "Вторник":
+                        sortedDays[1] = "Вторник";
+                        break;
+                    case "Среда":
+                        sortedDays[2] = "Среда";
+                        break;
+                    case "Четверг":
+                        sortedDays[3] = "Четверг";
+                        break;
+                    case "Пятница":
+                        sortedDays[4] = "Пятница";
+                        break;
+                    case "Суббота":
+                        sortedDays[5] = "Суббота";
+                        break;
+                }
+            }
+
+            string[] sortedDaysOfWeek = new string[daysOfWeek.Length];
+            int index = 0;
+            for (int i = 0; i < sortedDays.Length; i++)
+            {
+                if (sortedDays[i] != null)
+                {
+                    sortedDaysOfWeek[index] = sortedDays[i];
+                    index++;
+                }
+            }
+
+            return sortedDaysOfWeek;
         }
 
         /// <summary>
@@ -1355,6 +1402,9 @@ namespace timetable
             {
                 allfolders[i] = Path.GetFileName(allfolders[i]);
             }
+
+            Array.Sort(allfolders);
+
             str = allfolders[0];
             left = PositionLeft(str);
             Select(allfolders, left, 16);
@@ -1381,6 +1431,10 @@ namespace timetable
             {
                 allfiles[i] = Path.GetFileNameWithoutExtension(allfiles[i]);
             }
+
+            // сортировка дней недели
+            allfiles = SortedDaysOfWeek(allfiles);
+
             //Array.Sort(allfiles);
             str = allfiles[0];
             left = PositionLeft(str);
